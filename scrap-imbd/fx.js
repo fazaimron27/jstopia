@@ -1,6 +1,7 @@
 const request = require('request-promise')
 const cheerio = require('cheerio')
 const fs = require('fs')
+const { Parser } = require('json2csv');
 
 const Fx = (() => {
     return {
@@ -47,10 +48,15 @@ const Fx = (() => {
                     genres
                 })
 
-                fs.writeFileSync('./data.json', JSON.stringify(movieData), 'utf-8')
+                const fields = ['title', 'rating']
+                const opts = { fields }
 
-                console.log(movieData)
+                const parser = new Parser()
+                const csv = parser.parse(movieData)
                 
+                fs.writeFileSync('./data.json', JSON.stringify(movieData), 'utf-8')
+                fs.writeFileSync('./data.csv', csv, 'utf-8')
+                // console.log(csv)
             })
         }
     }
