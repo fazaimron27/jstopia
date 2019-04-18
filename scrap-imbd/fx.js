@@ -1,12 +1,14 @@
-const request = require('request-promise');
-const cheerio = require('cheerio');
+const request = require('request-promise')
+const cheerio = require('cheerio')
+const fs = require('fs')
 
 const Fx = (() => {
     return {
-        load: async URLS => {
-            let genres = [];
-            
-            for(let movie of URLS) {
+        load: URLS => {
+            let genres = []
+            let movieData = []
+
+            URLS.map( async movie => {
                 const response = await request({
                     uri: movie,
                     headers: {
@@ -36,15 +38,20 @@ const Fx = (() => {
                    genres.push(genre)
                 })
     
-                console.log(`
-                   Title: ${title}
-                   Rating: ${rating}
-                   Poster: ${poster}
-                   totalRatings: ${totalRatings}
-                   release Date: ${releaseDate}
-                   Genres: ${genres}
-                `)
-            }
+                movieData.push({
+                    title,
+                    rating,
+                    poster,
+                    totalRatings,
+                    releaseDate,
+                    genres
+                })
+
+                fs.writeFileSync('./data.json', JSON.stringify(movieData), 'utf-8')
+
+                console.log(movieData)
+                
+            })
         }
     }
 })()
