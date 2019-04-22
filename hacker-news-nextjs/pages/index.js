@@ -5,46 +5,61 @@ import Link from 'next/link'
 import Layout from '../components/Layout'
 import StoryList from '../components/StoryList'
 
-const App = props => {
-   const { page, stories } = props
+class App extends React.Component {
 
-   return stories.length === 0 ? <Error statusCode={503} /> : (
-      <Layout title="Hacker Next" description="A hacker news clone made with nextjs">
-         <main>
-            <StoryList stories={stories} />
-         </main>
-         <footer>
-            <Link href={`/?page=${ page + 1 }`}>
-               <a>More</a>
-            </Link>
-         </footer>
-         <style global jsx>
-            {`
-               * {
-                  margin: 0;
-               }
-               body {
-                  box-sizing: border-box;
-                  background-color: white;
-                  padding: 8px;
-                  font-family: Verdena, Geneva, sans-serif;
-               }
-            `}
-            </style>
-            <style jsx>
+   componentDidMount() {
+      if("serviceWorker" in navigator) {
+         navigator.serviceWorker
+            .register('/service-worker.js')
+            .then(registration => {
+               console.log('service worker registration successful ', registration)
+            })
+            .catch(err => {
+               console.warn('service worker registration failed ', err.message)
+            })
+      }
+   }
+
+   render() {
+      const { page, stories } = this.props
+      return stories.length === 0 ? <Error statusCode={503} /> : (
+         <Layout title="Hacker Next" description="A hacker news clone made with nextjs">
+            <main>
+               <StoryList stories={stories} />
+            </main>
+            <footer>
+               <Link href={`/?page=${ page + 1 }`}>
+                  <a>More</a>
+               </Link>
+            </footer>
+            <style global jsx>
                {`
-                  footer {
-                     padding: 1em;
+                  * {
+                     margin: 0;
                   }
-                  footer a {
-                     font-weight: bold;
-                     color: black;
-                     text-decoration: none;
+                  body {
+                     box-sizing: border-box;
+                     background-color: white;
+                     padding: 8px;
+                     font-family: Verdena, Geneva, sans-serif;
                   }
                `}
-            </style>
-      </Layout>
-   )
+               </style>
+               <style jsx>
+                  {`
+                     footer {
+                        padding: 1em;
+                     }
+                     footer a {
+                        font-weight: bold;
+                        color: black;
+                        text-decoration: none;
+                     }
+                  `}
+               </style>
+         </Layout>
+      )
+   }
 }
 
 App.getInitialProps = async ({ req, res, query }) => {
